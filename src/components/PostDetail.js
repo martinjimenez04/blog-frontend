@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown'; 
+import Loading from './Loading';
 
 function PostDetail() {
   const { slug } = useParams();  // extrae el slug de la URL
@@ -26,7 +28,7 @@ function PostDetail() {
   }, [slug]);
   
   if (loading) {
-    return <div className="App"><p>Cargando...</p></div>;
+    return <Loading />;
   }
   
   if (!post) {
@@ -47,13 +49,13 @@ function PostDetail() {
           <span className="category-badge">{post.category.name}</span>
           <h1>{post.title}</h1>
           <div className="post-meta">
-            <small>Publicado el {new Date(post.created_at).toLocaleDateString()}</small>
-            <small>Última actualización: {new Date(post.updated_at).toLocaleDateString()}</small>
+            <small>Publicado el {new Date(post.created_at + 'Z').toLocaleDateString('es-AR')}</small>
+            <small>Última actualización: {new Date(post.updated_at + 'Z').toLocaleDateString('es-AR')}</small>
           </div>
         </header>
         
         <div className="post-content">
-          {post.content}
+          <ReactMarkdown>{post.content}</ReactMarkdown>
         </div>
       </article>
     </div>
