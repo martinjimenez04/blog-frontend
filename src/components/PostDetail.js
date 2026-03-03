@@ -9,8 +9,10 @@ function PostDetail() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   
+const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
+
   useEffect(() => {
-    fetch(`http://localhost:8000/posts/${slug}`)
+    fetch(`${API_URL}/posts/${slug}`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Post no encontrado');

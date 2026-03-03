@@ -5,9 +5,11 @@ function Admin() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   
+const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
+
   useEffect(() => {
     // Cargar TODOS los posts (incluyendo borradores)
-    fetch('http://localhost:8000/posts?published_only=false')
+    fetch(`${API_URL}/posts?published_only=false`)
       .then(res => res.json())
       .then(data => {
         setPosts(data);
@@ -23,7 +25,7 @@ function Admin() {
     if (!window.confirm('¿Estás seguro de eliminar este post?')) return;
     
     try {
-      const response = await fetch(`http://localhost:8000/posts/${slug}`, {
+      const response = await fetch(`${API_URL}/posts/${slug}`, {
         method: 'DELETE'
       });
       
@@ -40,7 +42,7 @@ function Admin() {
   
   const togglePublished = async (post) => {
     try {
-      const response = await fetch(`http://localhost:8000/posts/${post.slug}`, {
+      const response = await fetch(`${API_URL}/posts/${post.slug}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ published: !post.published })

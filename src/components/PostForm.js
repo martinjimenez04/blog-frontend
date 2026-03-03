@@ -17,9 +17,11 @@ function PostForm() {
   });
   const [loading, setLoading] = useState(isEditing);
   
+const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
+  
   // Cargar categorías
   useEffect(() => {
-    fetch('http://localhost:8000/categories')
+    fetch(`${API_URL}/categories`)
       .then(res => res.json())
       .then(data => setCategories(data));
   }, []);
@@ -27,7 +29,7 @@ function PostForm() {
   // Si estamos editando, cargar el post
   useEffect(() => {
     if (isEditing) {
-      fetch(`http://localhost:8000/posts/${slug}`)
+      fetch(`${API_URL}/posts/${slug}`)
         .then(res => res.json())
         .then(data => {
           setFormData({
@@ -71,8 +73,8 @@ function PostForm() {
     e.preventDefault();
     
     const url = isEditing 
-      ? `http://localhost:8000/posts/${slug}`
-      : 'http://localhost:8000/posts';
+      ? `${API_URL}/posts/${slug}`
+      : `${API_URL}/posts`;
     
     const method = isEditing ? 'PUT' : 'POST';
     

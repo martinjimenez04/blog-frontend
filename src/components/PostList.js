@@ -9,9 +9,12 @@ function PostList() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
   
+  const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
+
+
   // Cargar posts
   useEffect(() => {
-    fetch('http://localhost:8000/posts')
+    fetch(`${API_URL}/posts`)
       .then(response => response.json())
       .then(data => {
         setPosts(data);
@@ -25,7 +28,7 @@ function PostList() {
   
   // Cargar categorías
   useEffect(() => {
-    fetch('http://localhost:8000/categories')
+    fetch(`${API_URL}/categories`)
       .then(response => response.json())
       .then(data => setCategories(data));
   }, []);
