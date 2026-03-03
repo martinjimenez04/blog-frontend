@@ -3,13 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown'; 
 import Loading from './Loading';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
+
 function PostDetail() {
   const { slug } = useParams();  // extrae el slug de la URL
   console.log('Slug actual:', slug);
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
 
   useEffect(() => {
     fetch(`${API_URL}/posts/${slug}`)

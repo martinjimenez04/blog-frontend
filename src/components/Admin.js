@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
+
 function Admin() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
-const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
 
   useEffect(() => {
     // Cargar TODOS los posts (incluyendo borradores)

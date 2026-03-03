@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
+
 function PostForm() {
   const navigate = useNavigate();
   const { slug } = useParams();  // Si existe, estamos editando
@@ -16,8 +18,6 @@ function PostForm() {
     published: false
   });
   const [loading, setLoading] = useState(isEditing);
-  
-const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
   
   // Cargar categorías
   useEffect(() => {
