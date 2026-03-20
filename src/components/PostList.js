@@ -8,19 +8,29 @@ function PostList() {
   const [posts, setPosts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
 
   // Cargar posts
   useEffect(() => {
     fetch(`${API_URL}/posts`)
-      .then(response => response.json())
+      .then(async response => {
+        if (!response.ok) {
+          throw new Error(`Error al cargar posts (${response.status})`);
+        }
+        return response.json();
+      })
       .then(data => {
+        if (!Array.isArray(data)) {
+          throw new Error('Formato invalido de posts recibido desde API');
+        }
         setPosts(data);
         setLoading(false);
       })
       .catch(error => {
         console.error('Error:', error);
+        setError('No se pudieron cargar los posts. Intenta nuevamente en unos minutos.');
         setLoading(false);
       });
   }, []);
@@ -28,18 +38,27 @@ function PostList() {
   // Cargar categorías
   useEffect(() => {
     fetch(`${API_URL}/categories`)
-      .then(response => response.json())
-      .then(data => setCategories(data));
+      .then(async response => {
+        if (!response.ok) {
+          throw new Error(`Error al cargar categorias (${response.status})`);
+        }
+        return response.json();
+      })
+      .then(data => setCategories(Array.isArray(data) ? data : []))
+      .catch(error => {
+        console.error('Error:', error);
+        setCategories([]);
+      });
   }, []);
   
   // Filtrar posts por búsqueda Y categoría
   const filteredPosts = posts.filter(post => {
     const matchesSearch = 
-      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase());
+      post.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = 
-      !selectedCategory || post.category.id === selectedCategory;
+      !selectedCategory || post.category?.id === selectedCategory;
     
     return matchesSearch && matchesCategory;
   });
@@ -78,7 +97,7 @@ function PostList() {
           Todos ({posts.length})
         </button>
         {categories.map(cat => {
-          const count = posts.filter(p => p.category.id === cat.id).length;
+          const count = posts.filter(p => p.category?.id === cat.id).length;
           return (
             <button
               key={cat.id}
@@ -93,6 +112,11 @@ function PostList() {
       
       {/* Lista de posts */}
       <div className="posts-list">
+        {error && (
+          <div className="empty-state">
+            <p>{error}</p>
+          </div>
+        )}
         {filteredPosts.length === 0 ? (
           <div className="empty-state">
             {searchTerm || selectedCategory ? (
@@ -115,7 +139,7 @@ function PostList() {
               <h2>{post.title}</h2>
               <p className="excerpt">{post.excerpt}</p>
               <div className="post-meta">
-                <span className="category">{post.category.name}</span>
+                <span className="category">{post.category?.name || 'Sin categoria'}</span>
                 <small>{new Date(post.created_at + 'Z').toLocaleDateString('es-AR', {timeZone: 'America/Argentina/Cordoba'})}</small>
               </div>
             </Link>

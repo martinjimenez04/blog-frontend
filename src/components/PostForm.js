@@ -9,6 +9,8 @@ function PostForm() {
   const isEditing = !!slug;
   
   const [categories, setCategories] = useState([]);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -22,8 +24,26 @@ function PostForm() {
   // Cargar categorías
   useEffect(() => {
     fetch(`${API_URL}/categories`)
-      .then(res => res.json())
-      .then(data => setCategories(data));
+      .then(async (res) => {
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`No se pudieron cargar categorias (${res.status}): ${errorText}`);
+        }
+        return res.json();
+      })
+      .then(data => {
+        setCategories(data);
+        if (data.length === 0) {
+          setCategoriesError('No hay categorias creadas en la base de datos. Crea al menos una categoria antes de publicar un post.');
+        } else {
+          setCategoriesError('');
+        }
+      })
+      .catch(error => {
+        console.error('Error al cargar categorias:', error);
+        setCategoriesError('Error al cargar categorias desde el backend. Revisa CORS, URL de API y logs del servidor.');
+      })
+      .finally(() => setCategoriesLoading(false));
   }, []);
   
   // Si estamos editando, cargar el post
@@ -140,11 +160,14 @@ function PostForm() {
         
         <div className="form-group">
           <label>Categoría *</label>
+          {categoriesLoading && <small>Cargando categorias...</small>}
+          {categoriesError && <small style={{ color: 'crimson', display: 'block', marginBottom: '8px' }}>{categoriesError}</small>}
           <select
             name="category_id"
             value={formData.category_id}
             onChange={handleChange}
             required
+            disabled={categoriesLoading || categories.length === 0}
           >
             <option value="">Seleccionar categoría...</option>
             {categories.map(cat => (
@@ -195,7 +218,11 @@ Escribe tu contenido en Markdown..."
         </div>
         
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary">
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={categoriesLoading || categories.length === 0}
+          >
             {isEditing ? 'Actualizar Post' : 'Crear Post'}
           </button>
           <button 

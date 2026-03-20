@@ -6,17 +6,24 @@ const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-productio
 function Admin() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     // Cargar TODOS los posts (incluyendo borradores)
     fetch(`${API_URL}/posts?published_only=false`)
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error(`Error al cargar posts (${res.status})`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setPosts(data);
+        setPosts(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(error => {
         console.error('Error:', error);
+        setError('No se pudo cargar el panel de posts.');
         setLoading(false);
       });
   }, []);
@@ -68,6 +75,7 @@ function Admin() {
         <h1>Panel de Administración</h1>
         <Link to="/admin/new" className="btn btn-primary">+ Nuevo Post</Link>
       </div>
+      {error && <p>{error}</p>}
       
       <div className="admin-posts">
         {posts.length === 0 ? (
@@ -91,7 +99,7 @@ function Admin() {
                       {post.title}
                     </Link>
                   </td>
-                  <td>{post.category.name}</td>
+                  <td>{post.category?.name || 'Sin categoria'}</td>
                   <td>
                     <button 
                       onClick={() => togglePublished(post)}
