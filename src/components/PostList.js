@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Loading from './Loading';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app';
+const API_URL = (process.env.REACT_APP_API_URL || 'https://blog-backend-production-ee19.up.railway.app').replace(/\/$/, '');
 
 function PostList() {
   const [posts, setPosts] = useState([]);
